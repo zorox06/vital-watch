@@ -19,13 +19,15 @@ export default function ShiftSummary({ patientId, vitals, alertCount }: Props) {
   ].join(" ");
 
   return (
-    <div className="glass-card p-4 space-y-2">
-      <div className="flex items-center gap-2">
-        <FileText className="w-4 h-4 text-primary" />
-        <h3 className="text-sm font-semibold text-foreground">Shift Handoff Summary</h3>
+    <div className="soft-card p-5 space-y-3">
+      <div className="flex items-center gap-2.5">
+        <div className="w-8 h-8 rounded-xl bg-lavender flex items-center justify-center">
+          <FileText className="w-4 h-4 text-lavender-foreground" />
+        </div>
+        <h3 className="text-sm font-bold font-display text-foreground">Shift Summary</h3>
       </div>
       <p className="text-xs text-muted-foreground leading-relaxed">{summary}</p>
-      <p className="text-[10px] text-muted-foreground/60">Auto-generated · {new Date().toLocaleTimeString()}</p>
+      <p className="text-[10px] text-muted-foreground/50 font-mono">Auto-generated · {new Date().toLocaleTimeString()}</p>
     </div>
   );
 }

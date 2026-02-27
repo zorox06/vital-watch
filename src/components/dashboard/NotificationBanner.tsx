@@ -26,13 +26,13 @@ export default function NotificationBanner() {
   if (!visible) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 p-2 animate-slide-up">
-      <div className="max-w-lg mx-auto glass-card border border-primary/20 p-3 flex items-center gap-3">
-        <div className="p-1.5 rounded-full bg-primary/15">
-          <Bell className="w-4 h-4 text-primary" />
+    <div className="fixed top-0 left-0 right-0 z-50 p-3 animate-slide-down">
+      <div className="max-w-lg mx-auto soft-card shadow-lg p-3.5 flex items-center gap-3 border-primary/20">
+        <div className="w-8 h-8 rounded-xl bg-mint flex items-center justify-center flex-shrink-0">
+          <Bell className="w-4 h-4 text-success" />
         </div>
-        <p className="text-xs text-foreground flex-1">{message}</p>
-        <button onClick={() => setVisible(false)} className="text-muted-foreground hover:text-foreground">
+        <p className="text-xs text-foreground flex-1 leading-relaxed">{message}</p>
+        <button onClick={() => setVisible(false)} className="text-muted-foreground hover:text-foreground p-1">
           <X className="w-4 h-4" />
         </button>
       </div>
