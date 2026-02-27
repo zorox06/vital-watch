@@ -1,73 +1,123 @@
-# Welcome to your Lovable project
+# VitalWatch — Remote Patient Monitoring IoT Agent
 
-## Project info
+A **real-time, ML-powered remote patient monitoring system** built with React, TypeScript, and Supabase. Doctors create monitoring rooms and patients join with a 6-digit code to stream vitals in real-time across devices.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## ✨ Features
 
-## How can I edit this code?
+### 🏥 Room-Based Architecture
+- **Doctor Dashboard** — Create monitoring rooms with unique 6-digit codes
+- **Patient Portal** — Join rooms and stream vitals to the doctor
+- **Cross-Device** — Works across different browsers/devices via Supabase Realtime Broadcast
 
-There are several ways of editing your application.
+### 🧠 ML-Powered Analysis (Client-Side)
+- **Anomaly Detection** — Z-score and IQR methods to detect abnormal vital readings
+- **Trend Prediction** — Linear regression with 5-step forecasting
+- **Pattern Recognition** — Identifies clinical deterioration patterns (sepsis, respiratory distress, etc.)
+- **Risk Scoring** — Composite ML-enhanced risk score (0-100)
+- **AI Insights** — Natural language insights and recommendations
 
-**Use Lovable**
+### 📡 Real-Time Data Streaming
+- Vitals update every **1 second** via Supabase Realtime Broadcast (WebSocket)
+- Heart Rate, Blood Pressure, SpO₂, Temperature, Respiratory Rate
+- Live connection status indicators
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### 🔐 Authentication
+- Separate login/signup for Doctors and Patients
+- Demo credentials for quick testing
+- Session persistence via localStorage
 
-Changes made via Lovable will be committed automatically to this repo.
+### 🎨 Premium UI
+- Glassmorphism cards with backdrop-blur
+- Gradient color system (teal for doctors, gold for patients)
+- Staggered entry animations and micro-interactions
+- Responsive design for all screen sizes
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🚀 Getting Started
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Prerequisites
+- Node.js 18+
+- A [Supabase](https://supabase.com) project
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### 1. Clone & Install
+```bash
+git clone https://github.com/zorox06/vital-watch.git
+cd vital-watch
+npm install
 ```
 
-**Edit a file directly in GitHub**
+### 2. Setup Supabase
+Create a `.env` file in the root:
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=your-anon-key
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Run the SQL setup in your Supabase SQL Editor:
+```sql
+-- See supabase-setup.sql for full script
+```
 
-**Use GitHub Codespaces**
+### 3. Run
+```bash
+npm run dev
+```
+Open `http://localhost:8080`
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## 🧪 Demo Credentials
 
-This project is built with:
+| Role | Email | Password |
+|---|---|---|
+| Doctor | doctor@vitalwatch.com | doctor123 |
+| Doctor | dr.chen@vitalwatch.com | chen123 |
+| Patient | john@email.com | patient123 |
+| Patient | sarah@email.com | patient123 |
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🔄 How to Test
 
-## How can I deploy this project?
+1. **Tab 1** → Select "I'm a Doctor" → Login → Create Monitoring Room → Note 6-digit code
+2. **Tab 2** → Select "I'm a Patient" → Login → Enter room code → Connect
+3. Patient vitals stream to doctor dashboard in real-time
+4. Click **AI** tab on doctor dashboard for ML analysis
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+---
 
-## Can I connect a custom domain to my Lovable project?
+## 🛠 Tech Stack
 
-Yes, you can!
+| Technology | Purpose |
+|---|---|
+| React + TypeScript | Frontend framework |
+| Vite | Build tool & dev server |
+| Supabase | Database + Realtime Broadcast |
+| Tailwind CSS | Styling |
+| shadcn/ui | UI components |
+| Recharts | Data visualization |
+| Lucide React | Icons |
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 📁 Project Structure
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+```
+src/
+├── components/dashboard/   # Vital cards, charts, ML components
+├── hooks/                  # useRoom, useMLAnalysis, useVitalsStream
+├── lib/                    # roomManager, mlEngine, auth, mockData
+├── pages/                  # Index, LoginPage, DoctorDashboard, PatientPortal
+└── integrations/supabase/  # Supabase client & types
+```
+
+## 🧠 ML Algorithms
+
+- **Z-Score Anomaly Detection** — Flags readings >2σ from the mean
+- **IQR Outlier Detection** — Uses interquartile range for robust outlier identification
+- **Linear Regression** — Fits trend lines and predicts 5 future values
+- **Pattern Matching** — Heuristic rules for clinical patterns (sepsis, cardiac, respiratory)
+- **Composite Risk Score** — Weighted combination of all ML signals
+
+---
+
+## 📄 License
+
+MIT

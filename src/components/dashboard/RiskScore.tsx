@@ -1,8 +1,9 @@
 interface Props {
   score: number;
+  isMLEnhanced?: boolean;
 }
 
-export default function RiskScore({ score }: Props) {
+export default function RiskScore({ score, isMLEnhanced }: Props) {
   const getInfo = () => {
     if (score >= 70) return { color: "hsl(0, 72%, 58%)", label: "Critical Risk", desc: "Immediate attention required", bg: "peach-card" };
     if (score >= 45) return { color: "hsl(38, 92%, 55%)", label: "Elevated Risk", desc: "Monitor closely, trending toward concern", bg: "accent-card" };
@@ -36,7 +37,12 @@ export default function RiskScore({ score }: Props) {
       <div>
         <p className="text-base font-bold font-display text-foreground">{label}</p>
         <p className="text-xs text-foreground/60 mt-0.5">{desc}</p>
-        <p className="text-[10px] text-foreground/40 mt-1 font-mono">AI Risk Assessment</p>
+        <div className="flex items-center gap-2 mt-1">
+          <p className="text-[10px] text-foreground/40 font-mono">AI Risk Assessment</p>
+          {isMLEnhanced && (
+            <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[9px] font-bold">ML ENHANCED</span>
+          )}
+        </div>
       </div>
     </div>
   );

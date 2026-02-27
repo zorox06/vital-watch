@@ -1,125 +1,90 @@
-import { useState } from "react";
-import { VITAL_CONFIGS, PATIENTS, getVitalStatus, computeRiskScore } from "@/lib/mockData";
-import { useVitalsStream } from "@/hooks/useVitalsStream";
-import PatientSelector from "@/components/dashboard/PatientSelector";
-import VitalCard from "@/components/dashboard/VitalCard";
-import RiskScore from "@/components/dashboard/RiskScore";
-import EmergencyModal from "@/components/dashboard/EmergencyModal";
-import AlertHistory from "@/components/dashboard/AlertHistory";
-import VitalsTimeline from "@/components/dashboard/VitalsTimeline";
-import BottomNav from "@/components/dashboard/BottomNav";
-import SOSButton from "@/components/dashboard/SOSButton";
-import NotificationBanner from "@/components/dashboard/NotificationBanner";
-import ShiftSummary from "@/components/dashboard/ShiftSummary";
-import ThresholdSettings from "@/components/dashboard/ThresholdSettings";
+import { useNavigate } from 'react-router-dom';
+import { Stethoscope, Heart, ArrowRight, Activity, Brain, Shield, Wifi } from 'lucide-react';
 
-type Tab = "dashboard" | "alerts" | "history" | "settings";
-
-const cardColors = [
-  "mint-card",
-  "sky-card",
-  "lavender-card",
-  "peach-card",
-  "accent-card",
-];
-
-const Index = () => {
-  const [patientId, setPatientId] = useState("p1");
-  const [activeTab, setActiveTab] = useState<Tab>("dashboard");
-  const { vitals, history, alerts, activeAlert, acknowledgeAlert, dispatchEmergency } = useVitalsStream(patientId);
-
-  const patient = PATIENTS.find(p => p.id === patientId)!;
-  const riskScore = computeRiskScore(vitals);
-  const unacknowledgedCount = alerts.filter(a => !a.acknowledged).length;
-  const enrichedAlerts = alerts.map(a => ({ ...a, patientName: patient.name }));
+export default function Index() {
+  const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <NotificationBanner />
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background gradient orbs */}
+      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] rounded-full bg-accent/5 blur-3xl pointer-events-none" />
 
-      <div className="max-w-lg mx-auto px-4 pt-6 space-y-5">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-muted-foreground">Good morning 👋</p>
-            <h1 className="text-2xl font-bold font-display text-foreground">Patient Monitor</h1>
+      <div className="max-w-md w-full space-y-8 animate-fade-in relative z-10">
+        {/* Logo & Title */}
+        <div className="text-center space-y-4">
+          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary via-primary/80 to-emerald-400/60 mx-auto flex items-center justify-center shadow-xl shadow-primary/25 float-gentle">
+            <Activity className="w-10 h-10 text-primary-foreground drop-shadow" />
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-mint text-success text-xs font-medium">
-              <div className="w-2 h-2 rounded-full bg-success pulse-live" />
-              Live
-            </div>
+          <div>
+            <h1 className="text-4xl font-bold font-display gradient-text tracking-tight">VitalWatch</h1>
+            <p className="text-muted-foreground text-sm mt-1.5 tracking-wide">Remote Patient Monitoring · IoT Agent</p>
           </div>
         </div>
 
-        <PatientSelector selectedId={patientId} onSelect={setPatientId} />
-
-        {activeTab === "dashboard" && (
-          <div className="space-y-5 animate-fade-in">
-            <RiskScore score={riskScore} />
-
-            {/* Vital Cards Grid */}
-            <div className="grid grid-cols-2 gap-3">
-              {VITAL_CONFIGS.map((config, i) => {
-                const value = vitals[config.key];
-                const status = getVitalStatus(config.key, value);
-                return (
-                  <VitalCard
-                    key={config.key}
-                    config={config}
-                    value={value}
-                    secondaryValue={config.key === "systolic" ? vitals.diastolic : undefined}
-                    status={status}
-                    history={history[config.key]}
-                    colorClass={status === "critical" ? "soft-card" : cardColors[i % cardColors.length]}
-                  />
-                );
-              })}
+        {/* Feature badges */}
+        <div className="flex justify-center gap-2.5 flex-wrap stagger-children">
+          {[
+            { icon: Brain, text: 'ML Analysis', bg: 'lavender-card' },
+            { icon: Wifi, text: 'Real-time IoT', bg: 'sky-card' },
+            { icon: Shield, text: 'Smart Alerts', bg: 'mint-card' },
+          ].map(badge => (
+            <div key={badge.text} className={`${badge.bg} px-3.5 py-2 rounded-xl flex items-center gap-2 animate-fade-in`}>
+              <badge.icon className="w-3.5 h-3.5 text-foreground/50" />
+              <span className="text-[11px] font-semibold text-foreground/60">{badge.text}</span>
             </div>
+          ))}
+        </div>
 
-            <VitalsTimeline history={history} />
-            <ShiftSummary patientId={patientId} vitals={vitals} alertCount={alerts.length} />
-          </div>
-        )}
-
-        {activeTab === "alerts" && (
-          <div className="space-y-4 animate-fade-in">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-peach flex items-center justify-center">
-                <span className="text-sm">🚨</span>
-              </div>
-              <h2 className="text-sm font-bold font-display text-foreground">Alert History</h2>
+        {/* Role Cards */}
+        <div className="space-y-3 stagger-children">
+          <button
+            onClick={() => navigate('/login/doctor')}
+            className="w-full glass-card p-5 flex items-center gap-4 text-left group transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-0.5 animate-fade-in"
+          >
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-emerald-500/70 flex items-center justify-center shadow-lg shadow-primary/20 flex-shrink-0 group-hover:shadow-xl group-hover:shadow-primary/30 group-hover:scale-105 transition-all duration-300">
+              <Stethoscope className="w-7 h-7 text-primary-foreground drop-shadow" />
             </div>
-            <AlertHistory alerts={enrichedAlerts} />
-          </div>
-        )}
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-bold font-display text-foreground">I'm a Doctor</h2>
+              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                Create a monitoring room and track your patient's vitals with ML-powered analysis
+              </p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-1.5 transition-all duration-300 flex-shrink-0" />
+          </button>
 
-        {activeTab === "history" && (
-          <div className="space-y-4 animate-fade-in">
-            <VitalsTimeline history={history} />
-            <ShiftSummary patientId={patientId} vitals={vitals} alertCount={alerts.length} />
-          </div>
-        )}
+          <button
+            onClick={() => navigate('/login/patient')}
+            className="w-full glass-card p-5 flex items-center gap-4 text-left group transition-all duration-300 hover:shadow-xl hover:shadow-accent/10 hover:-translate-y-0.5 animate-fade-in"
+          >
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent to-orange-400/70 flex items-center justify-center shadow-lg shadow-accent/20 flex-shrink-0 group-hover:shadow-xl group-hover:shadow-accent/30 group-hover:scale-105 transition-all duration-300">
+              <Heart className="w-7 h-7 text-accent-foreground drop-shadow" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-bold font-display text-foreground">I'm a Patient</h2>
+              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                Enter your doctor's room code to share your vitals for remote monitoring
+              </p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-muted-foreground/40 group-hover:text-accent group-hover:translate-x-1.5 transition-all duration-300 flex-shrink-0" />
+          </button>
+        </div>
 
-        {activeTab === "settings" && (
-          <div className="animate-fade-in">
-            <ThresholdSettings />
+        {/* Footer */}
+        <div className="text-center space-y-2 pt-2">
+          <p className="text-[10px] text-muted-foreground/40 font-mono tracking-wider">
+            VitalWatch IoT Agent v1.0 · ML-Powered Monitoring
+          </p>
+          <div className="flex justify-center gap-3 text-[10px] text-muted-foreground/30">
+            <span>Anomaly Detection</span>
+            <span className="text-primary/30">·</span>
+            <span>Trend Prediction</span>
+            <span className="text-primary/30">·</span>
+            <span>Pattern Recognition</span>
           </div>
-        )}
+        </div>
       </div>
-
-      <SOSButton />
-      <BottomNav active={activeTab} onTabChange={setActiveTab} alertCount={unacknowledgedCount} />
-
-      {activeAlert && !activeAlert.acknowledged && (
-        <EmergencyModal
-          alert={{ ...activeAlert, patientName: patient.name }}
-          onAcknowledge={acknowledgeAlert}
-          onDispatch={dispatchEmergency}
-        />
-      )}
     </div>
   );
-};
-
-export default Index;
+}
