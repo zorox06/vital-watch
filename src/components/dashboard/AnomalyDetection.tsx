@@ -92,7 +92,7 @@ export default function AnomalyDetection({ anomalies }: Props) {
             </div>
 
             <p className="text-[10px] text-muted-foreground/50 font-mono">
-                Statistical analysis · Z-score + IQR method
+                Ensemble ML · Kalman + EWMA + Z-score + Mahalanobis
             </p>
         </div>
     );

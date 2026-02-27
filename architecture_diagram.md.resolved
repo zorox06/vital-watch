@@ -1,0 +1,219 @@
+# VitalWatch — Architecture Diagram
+
+## High-Level System Overview
+
+```mermaid
+graph TB
+    subgraph "Client Layer"
+        WEB["🌐 React Web App<br/>(Vite + TypeScript)"]
+        APK["📱 Android APK<br/>(Capacitor)"]
+    end
+
+    subgraph "Frontend Application"
+        direction TB
+        ROUTER["React Router<br/>(BrowserRouter)"]
+        AUTH["Auth Guard<br/>(RequireAuth)"]
+        
+        subgraph "Pages"
+            IDX["Landing Page<br/>(Index)"]
+            LOGIN["Login Page<br/>(Doctor / Patient)"]
+            DOC["Doctor Dashboard"]
+            PAT["Patient Portal"]
+        end
+    end
+
+    subgraph "Backend Services"
+        SUPA_DB["🗄️ Supabase<br/>PostgreSQL Database"]
+        SUPA_RT["⚡ Supabase<br/>Realtime Broadcast"]
+        ML_SRV["🧠 Flask ML Server<br/>(localhost:5000)"]
+    end
+
+    WEB --> ROUTER
+    APK --> ROUTER
+    ROUTER --> AUTH
+    AUTH --> IDX
+    AUTH --> LOGIN
+    AUTH --> DOC
+    AUTH --> PAT
+
+    DOC <--> SUPA_RT
+    PAT <--> SUPA_RT
+    DOC --> SUPA_DB
+    PAT --> SUPA_DB
+    DOC --> ML_SRV
+
+    style WEB fill:#1a1a2e,stroke:#6366f1,color:#e0e0ff
+    style APK fill:#1a1a2e,stroke:#6366f1,color:#e0e0ff
+    style SUPA_DB fill:#1a2e1a,stroke:#22c55e,color:#e0ffe0
+    style SUPA_RT fill:#1a2e1a,stroke:#22c55e,color:#e0ffe0
+    style ML_SRV fill:#2e1a1a,stroke:#ef4444,color:#ffe0e0
+```
+
+---
+
+## Data Flow Architecture
+
+```mermaid
+flowchart LR
+    subgraph "Patient Device"
+        PS["Patient Portal"]
+        VG["Vitals Generator<br/>(mockData.ts)"]
+    end
+
+    subgraph "Supabase Cloud"
+        BC["Realtime Broadcast<br/>Channel: vitals-{roomCode}"]
+        DB["PostgreSQL<br/>rooms table"]
+    end
+
+    subgraph "Doctor Device"
+        DD["Doctor Dashboard"]
+        ML_LOCAL["Browser ML Engine<br/>(mlEngine.ts)"]
+    end
+
+    subgraph "Local ML Server"
+        FLASK["Flask API<br/>:5000"]
+        MODELS["Scikit-Learn Models<br/>RF · GBR · IF · ETR"]
+    end
+
+    VG -->|"2.5s interval"| PS
+    PS -->|"sendVitals()"| BC
+    BC -->|"subscribeToVitals()"| DD
+    DD -->|"vitals history"| ML_LOCAL
+    DD -->|"POST /api/analyze"| FLASK
+    FLASK --> MODELS
+    PS -->|"createRoom / validateRoom"| DB
+    DD -->|"createRoom / validateRoom"| DB
+
+    style BC fill:#1a2e1a,stroke:#22c55e,color:#e0ffe0
+    style DB fill:#1a2e1a,stroke:#22c55e,color:#e0ffe0
+    style FLASK fill:#2e1a1a,stroke:#ef4444,color:#ffe0e0
+    style MODELS fill:#2e1a1a,stroke:#ef4444,color:#ffe0e0
+    style ML_LOCAL fill:#1a1a2e,stroke:#a78bfa,color:#e0e0ff
+```
+
+---
+
+## Frontend Component Tree
+
+```mermaid
+graph TD
+    APP["App.tsx"]
+    APP --> IDX["Index (Landing)"]
+    APP --> LP["LoginPage"]
+    APP --> DD["DoctorDashboard"]
+    APP --> PP["PatientPortal"]
+
+    DD --> PS["PatientSelector"]
+    DD --> VC["VitalCard ×6"]
+    DD --> VT["VitalsTimeline"]
+    DD --> RS["RiskScore"]
+    DD --> AD["AnomalyDetection"]
+    DD --> PA["PredictiveAlerts"]
+    DD --> PR["PatternRecognition"]
+    DD --> MLP["MLInsightsPanel"]
+    DD --> AH["AlertHistory"]
+    DD --> SS["ShiftSummary"]
+    DD --> TS["ThresholdSettings"]
+    DD --> NB["NotificationBanner"]
+    DD --> EM["EmergencyModal"]
+    DD --> SOS["SOSButton"]
+    DD --> BN["BottomNav"]
+
+    style APP fill:#6366f1,stroke:#818cf8,color:#fff
+    style DD fill:#3b82f6,stroke:#60a5fa,color:#fff
+    style PP fill:#3b82f6,stroke:#60a5fa,color:#fff
+```
+
+---
+
+## ML Pipeline Architecture
+
+```mermaid
+flowchart TB
+    subgraph "Browser ML Engine (mlEngine.ts)"
+        direction TB
+        IN1["Input: Vital Histories"]
+        DA["detectAnomalies()<br/>Z-Score Analysis"]
+        PT["predictTrends()<br/>Linear Regression"]
+        DP["detectPatterns()<br/>Clinical Rules"]
+        RS["computeMLRiskScore()<br/>NEWS2 + Weighted"]
+        GI["generateInsights()<br/>Human-Readable"]
+        N2["computeNEWS2()<br/>Clinical Scoring"]
+    end
+
+    subgraph "Flask ML Server (ml_model.py)"
+        direction TB
+        IN2["Input: Raw Vitals + History"]
+        RF["RandomForestClassifier<br/>(100 trees, depth=12)"]
+        GB["GradientBoostingRegressor<br/>(150 trees, lr=0.1)"]
+        IF["IsolationForest<br/>(contamination=0.1)"]
+        ET["ExtraTreesRegressor<br/>(80 trees, depth=8)"]
+        FA["full_analysis()<br/>Risk + Anomalies + Trends + Patterns"]
+    end
+
+    IN1 --> DA & PT & DP
+    DA & PT & DP --> RS
+    RS --> GI
+    IN1 --> N2
+
+    IN2 --> RF & GB & IF & ET
+    RF & GB & IF & ET --> FA
+
+    style DA fill:#7c3aed,stroke:#a78bfa,color:#fff
+    style PT fill:#7c3aed,stroke:#a78bfa,color:#fff
+    style DP fill:#7c3aed,stroke:#a78bfa,color:#fff
+    style RF fill:#dc2626,stroke:#f87171,color:#fff
+    style GB fill:#dc2626,stroke:#f87171,color:#fff
+    style IF fill:#dc2626,stroke:#f87171,color:#fff
+    style ET fill:#dc2626,stroke:#f87171,color:#fff
+```
+
+---
+
+## Realtime Room System
+
+```mermaid
+sequenceDiagram
+    participant D as Doctor
+    participant S as Supabase
+    participant P as Patient
+
+    D->>S: createRoom(doctorName)
+    S-->>D: roomCode (6-digit)
+    D->>S: subscribeToVitals(roomCode)
+
+    P->>S: validateRoom(roomCode)
+    S-->>P: ✅ Active
+    P->>S: announceJoin(channel, name)
+    S-->>D: 🔔 patient_join event
+
+    loop Every 2.5 seconds
+        P->>S: sendVitals(channel, vitals)
+        S-->>D: 📊 vitals event
+    end
+
+    P->>S: announceLeave(channel, name)
+    S-->>D: 👋 patient_leave event
+    D->>S: closeRoom(roomCode)
+```
+
+---
+
+## Tech Stack Summary
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| **Frontend** | React 18 + TypeScript | UI framework |
+| **Bundler** | Vite 5 | Dev server & build |
+| **Styling** | TailwindCSS 3 | Utility-first CSS |
+| **UI Library** | shadcn/ui (Radix) | Component primitives |
+| **Charts** | Recharts | Vital sign graphs |
+| **State** | TanStack React Query | Server state |
+| **Routing** | React Router 6 | Client-side nav |
+| **Auth** | localStorage sessions | Demo auth |
+| **Database** | Supabase (PostgreSQL) | Room persistence |
+| **Realtime** | Supabase Broadcast | Live vitals streaming |
+| **Browser ML** | Custom TS engine | Anomaly, trend, pattern, NEWS2 |
+| **Server ML** | Flask + scikit-learn | RF, GBR, IF, ETR models |
+| **Mobile** | Capacitor 8 | Android APK wrapper |
+| **Testing** | Vitest + Testing Library | Unit tests |

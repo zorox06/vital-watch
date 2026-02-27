@@ -256,7 +256,7 @@ export default function DoctorDashboard() {
     ];
 
     return (
-        <div className="min-h-screen bg-background pb-20">
+        <div className="min-h-screen bg-background pb-28">
             <div className="max-w-lg mx-auto px-4 pt-6 space-y-5">
                 {/* Header */}
                 <div className="flex items-center justify-between">
@@ -403,8 +403,8 @@ export default function DoctorDashboard() {
             </div>
 
             {/* Bottom Nav */}
-            <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-border/60 pb-safe z-40">
-                <div className="max-w-lg mx-auto flex">
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40" style={{ width: 'min(280px, 70vw)' }}>
+                <div className="bg-card/95 backdrop-blur-xl border border-border/40 shadow-2xl shadow-black/10 rounded-[28px] px-3 py-2.5 flex items-center justify-around">
                     {tabConfig.map(tab => {
                         const Icon = tab.icon;
                         const isActive = activeTab === tab.key;
@@ -412,19 +412,17 @@ export default function DoctorDashboard() {
                             <button
                                 key={tab.key}
                                 onClick={() => setActiveTab(tab.key)}
-                                className={`flex-1 flex flex-col items-center gap-1 py-3 transition-colors relative ${isActive ? 'text-primary' : 'text-muted-foreground'
+                                className={`relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 ${isActive
+                                    ? 'bg-primary/12 text-primary scale-110'
+                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                                     }`}
                             >
-                                <div className="relative">
-                                    <Icon className="w-5 h-5" />
-                                    {tab.badge && tab.badge > 0 && (
-                                        <span className="absolute -top-1.5 -right-2 px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold min-w-[16px] text-center">
-                                            {tab.badge}
-                                        </span>
-                                    )}
-                                </div>
-                                <span className="text-[10px] font-medium">{tab.label}</span>
-                                {isActive && <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-primary" />}
+                                <Icon className={`w-[22px] h-[22px] transition-transform duration-200 ${isActive ? 'drop-shadow-sm' : ''}`} />
+                                {tab.badge > 0 && (
+                                    <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-[20px] rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center px-1 ring-[2.5px] ring-card shadow-md animate-in zoom-in-50">
+                                        {tab.badge > 9 ? '9+' : tab.badge}
+                                    </span>
+                                )}
                             </button>
                         );
                     })}

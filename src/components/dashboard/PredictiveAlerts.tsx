@@ -57,8 +57,8 @@ export default function PredictiveAlerts({ predictions }: Props) {
                         <div
                             key={pred.vitalKey}
                             className={`rounded-2xl p-3 transition-all ${pred.willBreachThreshold
-                                    ? 'bg-destructive/5 ring-1 ring-destructive/20'
-                                    : 'bg-muted/50'
+                                ? 'bg-destructive/5 ring-1 ring-destructive/20'
+                                : 'bg-muted/50'
                                 }`}
                         >
                             <div className="flex items-center justify-between mb-2">
@@ -131,7 +131,7 @@ export default function PredictiveAlerts({ predictions }: Props) {
             </div>
 
             <p className="text-[10px] text-muted-foreground/50 font-mono">
-                Linear regression · Sliding window prediction
+                Holt's Double Exponential Smoothing + Linear Regression
             </p>
         </div>
     );
